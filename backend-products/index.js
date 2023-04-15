@@ -12,11 +12,19 @@ app.use(cors());
 app.use(bodyParser.json());
 
 mongoose.connect(mongo_url, {});
-const connection = mongoose.connection;
+const connection = mongoose.connection; 
 
 connection.once("open", () => {
   console.log("Database Connection Successful");
 })
+
+
+
+const creamRouter = require("./routes/CreamRoute");
+app.use("/cream", creamRouter);
+
+
+
 
 app.listen(port, () => {
   console.log(`Server is listening on port ${port}`)
