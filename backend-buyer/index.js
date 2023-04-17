@@ -1,23 +1,33 @@
-const express = require('express');
-const app = express();
-const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
-const cors  = require('cors');
 require("dotenv").config();
 
-const port = process.env.PORT || 8080
-const mongo_url = process.env.MONGO_URL;
+const express = require("express");
+const mongoose = require("mongoose");
+const cartRoutes = require("./routes/cartRoutes");
 
-app.use(cors());
-app.use(bodyParser.json());
+//express app
+const app = express();
 
-mongoose.connect(mongo_url, {});
-const connection = mongoose.connection;
+//middleware
+app.use(express.json());
 
-connection.once("open", () => {
-  console.log("Database Connection Successful");
-})
+app.use((req, res, next) => {
+  console.log(req.path, req.method);
+  next();
+});
 
-app.listen(port, () => {
-  console.log(`Server is listening on port ${port}`)
-})
+//routes
+app.use("/api/cart", cartRoutes);
+
+//connect to DB
+mongoose.set("strictQuery", false);
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => {
+    //listen for requests
+    app.listen(process.env.PORT, () => {
+      console.log("Connected to DB & listening on port", process.env.PORT);
+    });
+  })
+  .catch((error) => {
+    console.log(error);
+  });
